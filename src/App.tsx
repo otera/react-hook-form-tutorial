@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form";
+import { TextField, FormLabel } from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import "./App.css";
@@ -11,6 +12,8 @@ interface LoginForm {
 
 const validationSchema = z.object({
   name: z
+    // modeがonBlurの時、defaultValuesが無いとrequired_errorが表示される
+    // .string({ required_error: "required_error" })
     .string()
     .nonempty("名前は必須です")
     .min(4, "名前は4文字以上で入力してください"),
@@ -27,11 +30,17 @@ const validationSchema = z.object({
 function App() {
   //フォーム状態とメソッドを取得
   const {
-    register, //フォームから入力された値のstate管理、バリデーション処理が可能
+    control,
+    // register, //フォームから入力された値のstate管理、バリデーション処理が可能
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>({
-    mode: "onChange",
+    mode: "onBlur",
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
     shouldUnregister: false,
     resolver: zodResolver(validationSchema),
   });
@@ -44,7 +53,22 @@ function App() {
     <div className="form-container">
       <h1>React-Hook-Form</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="">名前</label>
+        <FormLabel>名前</FormLabel>
+        <Controller
+          control={control}
+          name="name"
+          render={({ field }) => (
+            <TextField
+              {...field}
+              type="text"
+              placeholder="田中　太郎"
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              sx={{ width: "100%" }}
+            />
+          )}
+        />
+        {/* <label htmlFor="">名前</label>
         <input
           type="text"
           id="name"
@@ -54,9 +78,24 @@ function App() {
           // })}
           {...register("name")}
         />
-        {errors.name && <p>{errors.name.message as React.ReactNode}</p>}
+        {errors.name && <p>{errors.name.message as React.ReactNode}</p>} */}
 
-        <label htmlFor="email">メールアドレス</label>
+        <FormLabel>メールアドレス</FormLabel>
+        <Controller
+          control={control}
+          name="email"
+          render={({ field }) => (
+            <TextField
+              {...field}
+              type="email"
+              placeholder="sample@example.com"
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              sx={{ width: "100%" }}
+            />
+          )}
+        />
+        {/* <label htmlFor="email">メールアドレス</label>
         <input
           type="email"
           id="email"
@@ -69,9 +108,23 @@ function App() {
           // })}
           {...register("email")}
         />
-        {errors.email && <p>{errors.email.message as React.ReactNode}</p>}
+        {errors.email && <p>{errors.email.message as React.ReactNode}</p>} */}
 
-        <label htmlFor="password">パスワード</label>
+        <FormLabel>パスワード</FormLabel>
+        <Controller
+          control={control}
+          name="password"
+          render={({ field }) => (
+            <TextField
+              {...field}
+              type="password"
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              sx={{ width: "100%" }}
+            />
+          )}
+        />
+        {/* <label htmlFor="password">パスワード</label>
         <input
           id="password"
           type="password"
@@ -81,7 +134,7 @@ function App() {
           // })}
           {...register("password")}
         />
-        {errors.password && <p>{errors.password.message as React.ReactNode}</p>}
+        {errors.password && <p>{errors.password.message as React.ReactNode}</p>} */}
 
         <button type="submit">送信</button>
       </form>
