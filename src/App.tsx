@@ -10,22 +10,27 @@ interface LoginForm {
   password: string;
 }
 
-const validationSchema = z.object({
-  name: z
-    // modeがonBlurの時、defaultValuesが無いとrequired_errorが表示される
-    // .string({ required_error: "required_error" })
-    .string()
-    .nonempty("名前は必須です")
-    .min(4, "名前は4文字以上で入力してください"),
-  email: z
-    .string()
-    .nonempty("メールアドレスは必須です")
-    .email("正しいメールアドレスを入力してください"),
-  password: z
-    .string()
-    .nonempty("パスワードは必須です")
-    .min(6, "パスワードは6文字以上で入力してください"),
-});
+const validationSchema = z
+  .object({
+    name: z
+      // modeがonBlurの時、defaultValuesが無いとrequired_errorが表示される
+      // .string({ required_error: "required_error" })
+      .string()
+      .nonempty("名前は必須です")
+      .min(4, "名前は4文字以上で入力してください"),
+    email: z
+      .string()
+      .nonempty("メールアドレスは必須です")
+      .email("正しいメールアドレスを入力してください"),
+    password: z
+      .string()
+      .nonempty("パスワードは必須です")
+      .min(6, "パスワードは6文字以上で入力してください"),
+  })
+  .refine((args) => {
+    // カスタムバリデーションロジックを追加
+    console.log(args);
+  });
 
 function App() {
   //フォーム状態とメソッドを取得
@@ -59,7 +64,14 @@ function App() {
           name="name"
           render={({ field }) => (
             <TextField
-              {...field}
+              // {...field}
+              // start スプレッド構文を使わない場合は個別に指定
+              // onChange,onBlurがないと動作しない
+              name={field.name}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              // end
               type="text"
               placeholder="田中　太郎"
               error={!!errors.name}
